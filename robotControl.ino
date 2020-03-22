@@ -25,6 +25,7 @@ void setup() {
  digitalWrite(B_Break, LOW);
  A = 0;
  B = 0;
+ Serial.println("Finished setup");
 }
 boolean checkForBall() {
   //KOD för att läsa av fram sensorererna och avgöra om en boll är där
@@ -43,7 +44,7 @@ void enterArena() {
 void findBall() {
 
     if ( checkForBall()){
-      digitalWrite(A_dir, High);
+      digitalWrite(A_dir, HIGH);
       digitalWrite(B_dir, Low);
       A = 200;
       B = 200;
@@ -56,12 +57,12 @@ void findBall() {
 
 void fetchBall() {
   //Kör framåt
-  digitalWrite(A_dir, High);
+  digitalWrite(A_dir, HIGH);
   digitalWrite(B_dir, HIGH);
   A = 200;
   B = 200;
-  digitalWrite(A_PWM, A);
-  digitalWrite(B_PWM, B);
+  analogWrite(A_PWM, A);
+  analogWrite(B_PWM, B);
   // till roboten krockar med väggen
   while(!checkForWall() ) {
     delay(10);
@@ -77,12 +78,12 @@ void findNet() {
     return;
   }
   // annars Börja rotera
-  digitalWrite(A_dir, High);
+  digitalWrite(A_dir, HIGH);
   digitalWrite(B_dir, LOW);
   A = 200;
   B = 200;
-  digitalWrite(A_PWM, A);
-  digitalWrite(B_PWM, B);
+  analogWrite(A_PWM, A);
+  analogWrite(B_PWM, B);
   // rotera tills nätet är bakom roboten
   while( !checkForNet) {
     delay(10);
@@ -96,8 +97,8 @@ void throwBall() {
   digitalWrite(B_dir, LOW);
   A = 200;
   B = 200;
-  digitalWrite(A_PWM, A);
-  digitalWrite(B_PWM, B);
+  analogWrite(A_PWM, A);
+  analogWrite(B_PWM, B);
   // till roboten krockar med nätet
   while(!checkForWall() ) {
     delay(10);
@@ -108,20 +109,62 @@ void throwBall() {
 }
 
 void backAndForth() {
-
+  A = 200;
+  B = 200;
+  for(int i = 0; i < 5; i++;) {
+    digitalWrite(A_Dir, HIGH);
+    digitalWrite(B_Dir, HIGH);
+    analogWrite( A_PWM, A);
+    analogWrite( B_PWM, B);
+    delay(1000);
+    digitalWrite(A_Dir, LOW);
+    digitalWrite(B_Dir, LOW);
+    delay(1000);
+  }
 }
-void loop() {
 
+void rotate() {
+  digitalWrite(A_dir, HIGH);
+  digitalWrite(B_dir, LOW);
+  A = 200;
+  B = 200;
+  analogWrite(A_PWM, A);
+  analogWrite(B_PWM, B);
+  delay(2000);
+  digitalWrite(A_dir, LOW);
+  digitalWrite(B_dir, HIGH);
+}
+
+void circle() {
+  for(int i = 0; i < 2; i++;) {
+    A = 200;
+    B = 50;
+    digitalWrite(A_Dir, HIGH);
+    digitalWrite(B_Dir, HIGH);
+    analogWrite( A_PWM, A);
+    analogWrite( B_PWM, B);
+    delay(1000);
+    B = 200;
+    A = 50;
+    analogWrite( A_PWM, A);
+    analogWrite( B_PWM, B);
+    delay(1000);
+  }
+}
+
+
+void loop() {
+  Serial.println("starting loop");
   //findBall();
   //fetchBall();
   //findNet();
   //throwBall();
-
   //Upvisningskod
-
+  Serial.println("starting backAndForth");
   backAndForth();
-  rotate(1);
-  rotate(0);
+  Serial.println("starting Rotate");
+  rotate();
+  Serial.println("starting Circle");
   circle();
 
 
