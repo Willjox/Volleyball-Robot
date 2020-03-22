@@ -92,14 +92,14 @@ void findNet() {
 }
 
 void throwBall() {
-  //Kör bakåt
+  //Kör bakåt ..
   digitalWrite(A_dir, LOW);
   digitalWrite(B_dir, LOW);
   A = 200;
   B = 200;
   analogWrite(A_PWM, A);
   analogWrite(B_PWM, B);
-  // till roboten krockar med nätet
+  // .. till roboten krockar med nätet
   while(!checkForWall() ) {
     delay(10);
   }
@@ -160,6 +160,7 @@ void loop() {
   //findNet();
   //throwBall();
   //Upvisningskod
+  //gitpill
   Serial.println("starting backAndForth");
   backAndForth();
   Serial.println("starting Rotate");
