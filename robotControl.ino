@@ -1,4 +1,4 @@
-// put your setup code here, to run once:
+// Motorshield pins
 #define A_Dir  12
 #define B_Dir  13
 #define A_PWM  3
@@ -7,8 +7,7 @@
 #define B_I  1
 #define A_Break  9
 #define B_Break  0
-
-#define BallSize 10
+//left right motor
 int A;
 int B;
 
@@ -27,17 +26,28 @@ void setup() {
  A = 0;
  B = 0;
 }
-void enterArena() {
+boolean checkForBall() {
+  //KOD för att läsa av fram sensorererna och avgöra om en boll är där
+}
+boolean checkForNet() {
+  //kod för att läsa av baksensorer och avgöra om nätet är i den riktningen
+}
 
+boolean checkForWall() {
+  //känn av en vägg på ett säkert avstånd
+}
+
+void enterArena() {
+// kod för att gå in på planen
 }
 void findBall() {
 
-    if ( upperFrontSensor - lowerFrontSensor >= BallSize){
+    if ( checkForBall()){
       digitalWrite(A_dir, High);
       digitalWrite(B_dir, Low);
-      A = 255;
-      B = 255;
-      while(upperFrontSensor - lowerFrontSensor >= BallSize ) {
+      A = 200;
+      B = 200;
+      while(!checkForBall()) {
         delay(10);
       }
     }
@@ -53,7 +63,7 @@ void fetchBall() {
   digitalWrite(A_PWM, A);
   digitalWrite(B_PWM, B);
   // till roboten krockar med väggen
-  while(upperFrontSensor <= safeWallDistance ) {
+  while(!checkForWall() ) {
     delay(10);
   }
   return;
@@ -62,7 +72,7 @@ void fetchBall() {
 
 void findNet() {
   //Kolla om nätet är bakom roboten
-  if (upperBackSensor - lowerBackSenor < 10) {
+  if (checkForNet()) {
     //om nätet är bakom roboten
     return;
   }
@@ -74,7 +84,7 @@ void findNet() {
   digitalWrite(A_PWM, A);
   digitalWrite(B_PWM, B);
   // rotera tills nätet är bakom roboten
-  while( upperBackSensor - lowerBackSenor < 10) {
+  while( !checkForNet) {
     delay(10);
   }
   return;
@@ -82,26 +92,37 @@ void findNet() {
 
 void throwBall() {
   //Kör bakåt
-  digitalWrite(A_dir, High);
-  digitalWrite(B_dir, HIGH);
+  digitalWrite(A_dir, LOW);
+  digitalWrite(B_dir, LOW);
   A = 200;
   B = 200;
   digitalWrite(A_PWM, A);
   digitalWrite(B_PWM, B);
   // till roboten krockar med nätet
-  while(upperFrontSensor <= safeWallDistance ) {
+  while(!checkForWall() ) {
     delay(10);
   }
 
+  //TODO: kasta bollen
+
 }
 
+void backAndForth() {
 
+}
 void loop() {
 
-  findBall();
-  fetchBall();
-  findNet();
-  throwBall();
+  //findBall();
+  //fetchBall();
+  //findNet();
+  //throwBall();
+
+  //Upvisningskod
+
+  backAndForth();
+  rotate(1);
+  rotate(0);
+  circle();
 
 
 }
