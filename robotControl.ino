@@ -7,8 +7,11 @@
 #define B_I  1
 #define A_Break  9
 #define B_Break  0
+
+#define BallSize 10
 int A;
 int B;
+
 
 void setup() {
  Serial.begin(9600);
@@ -21,27 +24,84 @@ void setup() {
  pinMode(B_Break, OUTPUT);
  digitalWrite(A_Break, LOW);
  digitalWrite(B_Break, LOW);
- A = 50;
- B = 50;
+ A = 0;
+ B = 0;
 }
+void enterArena() {
+
+}
+void findBall() {
+
+    if ( upperFrontSensor - lowerFrontSensor >= BallSize){
+      digitalWrite(A_dir, High);
+      digitalWrite(B_dir, Low);
+      A = 255;
+      B = 255;
+      while(upperFrontSensor - lowerFrontSensor >= BallSize ) {
+        delay(10);
+      }
+    }
+  return;
+}
+
+void fetchBall() {
+  //Kör framåt
+  digitalWrite(A_dir, High);
+  digitalWrite(B_dir, HIGH);
+  A = 200;
+  B = 200;
+  digitalWrite(A_PWM, A);
+  digitalWrite(B_PWM, B);
+  // till roboten krockar med väggen
+  while(upperFrontSensor <= safeWallDistance ) {
+    delay(10);
+  }
+  return;
+
+}
+
+void findNet() {
+  //Kolla om nätet är bakom roboten
+  if (upperBackSensor - lowerBackSenor < 10) {
+    //om nätet är bakom roboten
+    return;
+  }
+  // annars Börja rotera
+  digitalWrite(A_dir, High);
+  digitalWrite(B_dir, LOW);
+  A = 200;
+  B = 200;
+  digitalWrite(A_PWM, A);
+  digitalWrite(B_PWM, B);
+  // rotera tills nätet är bakom roboten
+  while( upperBackSensor - lowerBackSenor < 10) {
+    delay(10);
+  }
+  return;
+}
+
+void throwBall() {
+  //Kör bakåt
+  digitalWrite(A_dir, High);
+  digitalWrite(B_dir, HIGH);
+  A = 200;
+  B = 200;
+  digitalWrite(A_PWM, A);
+  digitalWrite(B_PWM, B);
+  // till roboten krockar med nätet
+  while(upperFrontSensor <= safeWallDistance ) {
+    delay(10);
+  }
+
+}
+
 
 void loop() {
 
- digitalWrite(A_Dir, HIGH);
- digitalWrite(B_Dir, HIGH);
- analogWrite( A_PWM, A);
- analogWrite( B_PWM, B);
- delay(500);
- Serial.println("yo");
- //analogWrite( A_PWM, 100);
- Serial.println("no");
- //analogWrite( B_PWM, 100);
-
- digitalWrite(A_Dir, LOW);
- digitalWrite(B_Dir, LOW);
- delay(500);
- A++;
- B++;
+  findBall();
+  fetchBall();
+  findNet();
+  throwBall();
 
 
 }
