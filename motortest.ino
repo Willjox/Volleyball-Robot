@@ -29,7 +29,7 @@ void setup() {
   Serial.begin(9600);
 
   // SERVO
-  myservo1.attach(27); 
+  myservo1.attach(27);
   myservo2.attach(37);
 
  // MOTOR PINS
@@ -45,7 +45,7 @@ void setup() {
   pinMode(echoPin_upper, INPUT);
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
- 
+
   digitalWrite(A_Break, LOW);
   digitalWrite(B_Break, LOW);
   pos2 = 0;
@@ -61,7 +61,7 @@ void setup() {
 }
 
 
-void loop() {   
+void loop() {
   ballstate();
   drivetoball();
   //pickupball();
@@ -101,14 +101,14 @@ long ping(int trigPin , int echoPin) {
     delayMicroseconds(5);
     digitalWrite(trigPin, LOW);
     pinMode(echoPin, INPUT);
-  } else{ 
+  } else{
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(5);
-    digitalWrite(trigPin, LOW); 
+    digitalWrite(trigPin, LOW);
   }
-  
+
   duration = pulseIn(echoPin, HIGH);
   cm = microsecondsToCentimeters(duration);
   //Serial.println(cm);
@@ -118,73 +118,80 @@ long ping(int trigPin , int echoPin) {
 int findBall(){
   upperCm = ping(trigPin_upper, echoPin_upper);
   if (upperCm > 200) {
-    upperCm = 200; 
+    upperCm = 200;
   }
   lowerCm = ping(lower_dreader, lower_dreader);
   Serial.print(upperCm);
   Serial.print(" ");
   Serial.println(lowerCm);
   delay(10);
-  
+
   if(lowerCm < (upperCm - 4)){
     digitalWrite(led1, HIGH);
-    return 1; 
-    
+    return 1;
+
   } else{
     digitalWrite(led1, LOW);
     return 0;
-  } 
+  }
 }
 
 void drivetoball(){
-  
+
   for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 180 degrees// in steps of 1 degree
     myservo1.write(pos);// tell servo to go to position in variable 'pos'
     myservo2.write(pos2);
     pos2 -= 1;
     delay(5);                       // waits 15ms for the servo to reach the position
   }
-  
+
   int x = 0;
   long dist;
+  unsigned long startTime = millis();
   while(x < 3){
     x = 0;
     for(int i = 0; i < 3; i++) {
         dist = ping(trigPin_upper, echoPin_upper);
         if (dist < 30) {
-          x++; 
+          x++;
         }
-    }
+      }
+      if  (startTime - millis() > 20000) {
+          break;
+      }
     digitalWrite(A_Dir, LOW);
     digitalWrite(B_Dir, LOW);
     analogWrite(A_PWM, 255); //Ändrad
     analogWrite(B_PWM, 200 );
   }
-
   analogWrite(A_PWM, 0);
   analogWrite(B_PWM, 0);
   delay(500);
 }
 
 void pickupball(){
-  
+
 }
 
 void backup(){
   int x = 0;
   long dist;
+  unsigned long startTime = milis();
   while(x < 3){
     x = 0;
     for(int i = 0; i < 10; i++) {
         dist = ping(trigPin_upper, echoPin_upper);
-        if (dist > 80) {
-          x++; 
+        if (dist > 80 ) {
+          x++;
         }
     }
     digitalWrite(A_Dir, HIGH);
     digitalWrite(B_Dir, HIGH);
     analogWrite(A_PWM, 255);
     analogWrite(B_PWM, 180);
+    if (startTime - millis() > 20000) {
+      break;
+    }
   }
 
   while(true){
