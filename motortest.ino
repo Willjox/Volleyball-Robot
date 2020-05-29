@@ -17,9 +17,15 @@ int pos, pos2;
 #define led1 53
 #define led2 23
 
+#define trigPin_BackUp 26
+#define echoPin_backUp 27
+
+#define trigPin_BackLow 44
+#define echoPin_backLow 45
+
 //Pins for dReader
-const int trigPin_upper = 43;
-const int echoPin_upper= 41;
+#define trigPin_upper  43
+#define echoPin_upper 41
 
 const int lower_dreader = 39;
 
@@ -62,15 +68,27 @@ void setup() {
 
 
 void loop() {
-  ballstate();
-  drivetoball();
+  //enterArena();
+  //ballstate();
+  //drivetoball();
   //pickupball();
-  backup();
-  //findnet();  //Använd kompass?
-  //drivetonet();
+  //backup();
+  netState();  //Använd kompass?
+  drivetonet();
   //score();    //Använd servo
 }
 
+void enterArena() {
+  digitalWrite(A_Dir, LOW);
+  digitalWrite(B_Dir, LOW);
+  unsigned long startTime = millis();
+  while(startTime - millis() < 5000) {
+    analogWrite(A_PWM, 255);
+    analogWrite(B_PWM, 200 );
+  }
+
+
+}
 
 void ballstate(){
   digitalWrite(A_Dir, HIGH);
@@ -199,6 +217,72 @@ void backup(){
     analogWrite(B_PWM, 0);
   }
 }
+
+void netState() {
+  digitalWrite(A_Dir, HIGH);
+  digitalWrite(B_Dir, LOW);
+  delay(5);
+  int x = 0;
+  while(x < 7){
+    x = 0;
+    analogWrite(A_PWM, 255);
+    analogWrite(B_PWM, 255 );
+    delay(50);
+    analogWrite(A_PWM, 0);
+    analogWrite(B_PWM, 0);
+    delay(1000);
+    for(int i = 0; i < 10; i++) {
+      x = x + findNet();
+    }
+  }
+  digitalWrite(led2, LOW);
+}
+
+int findNet {
+  upperCm = ping(trigPin_BackUp, echoPin_backUp);
+  if (upperCm > 250) {
+    upperCm = 250;
+  }
+  lowerCm = ping(trigPin_BackLow, echoPin_backLow);
+  Serial.print(upperCm);
+  Serial.print(" ");
+  Serial.println(lowerCm);
+  delay(10);
+
+  if(lowerCm < (upperCm - 10)){
+    digitalWrite(led1, HIGH);
+    return 1;
+
+  } else{
+    digitalWrite(led1, LOW);
+    return 0;
+  }
+}
+
+drivetonet(){
+  long dist;
+  unsigned long startTime = millis();
+  while(x < 3){
+    x = 0;
+    for(int i = 0; i < 3; i++) {
+        dist = ping(trigPin_BackLow, echoPin_backLow);
+        if (dist < 30) {
+          x++;
+        }
+      }
+      if  (startTime - millis() > 20000) {
+          break;
+      }
+    digitalWrite(A_Dir, HIGH);
+    digitalWrite(B_Dir, HIGH);
+    analogWrite(A_PWM, 255); //Ändrad
+    analogWrite(B_PWM, 200 );
+  }
+  analogWrite(A_PWM, 0);
+  analogWrite(B_PWM, 0);
+  delay(500);
+}
+
 
 //  Converts time in microseconds from distance readers and RETURNS value in cm.
 //
