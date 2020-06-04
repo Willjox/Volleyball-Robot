@@ -86,7 +86,22 @@ void enterArena() {
     }
   }
 
-void setServoPosition() {
+void setServoPosition(int finalPos) {
+  if finalPos > pos {
+    for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 90 degrees// in steps of 1 degree
+      myservo1.write(pos);
+      myservo2.write(pos2);
+      pos2 -= 1;
+      delay(5);
+    }
+  } else if (finalPos < pos) {
+    for (pos; pos >= 0; pos -= 1) {
+      myservo1.write(pos);
+      myservo2.write(pos2);
+      pos2 += 1;
+      delay(5);                       
+    }
+  }
 }
 
 int findDiff(int upperTrig, int upperEcho, int lowerTrig int lowerEcho, int minimumDiff) {
@@ -156,11 +171,11 @@ void ballstate(){
 
 void drivetoball(){
 
-  for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 180 degrees// in steps of 1 degree
-    myservo1.write(pos);// tell servo to go to position in variable 'pos'
+  for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 90 degrees// in steps of 1 degree
+    myservo1.write(pos);
     myservo2.write(pos2);
     pos2 -= 1;
-    delay(5);                       // waits 15ms for the servo to reach the position
+    delay(5);
   }
 
   int x = 0;
