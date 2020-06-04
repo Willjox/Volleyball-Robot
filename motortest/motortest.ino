@@ -295,7 +295,7 @@ void drivetonet(){
           x++;
         }
       }
-      if  (startTime - millis() > 20000) {
+      if  (millis() - startTime > 20000) {
           break;
       }
     digitalWrite(A_Dir, LOW);
