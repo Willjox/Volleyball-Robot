@@ -62,27 +62,29 @@ void setup() {
   digitalWrite(B_Break, LOW);
   pos2 = 0;
   pos = 0;
+  //enterArena();
 }
 
 
 void loop() {
-  //enterArena();
+
   ballstate();
   //drivetoball();
   //pickupball();
   //backup();
   //netState();  //Använd kompass?
   //drivetonet();
-  //score();    //Använd servo
+
 }
 
 void enterArena() {
   digitalWrite(A_Dir, LOW);
   digitalWrite(B_Dir, LOW);
   unsigned long startTime = millis();
-  while(startTime - millis() < 2000) {
+  while(millis() - startTime < 2000) {
     analogWrite(A_PWM, 255);
     analogWrite(B_PWM, 200 );
+    delay(100);
     }
   }
 
@@ -150,7 +152,7 @@ long ping(int trigPin , int echoPin) {
 
 
 void ballstate(){
-  //setServoPosition(90);
+  setServoPosition(90);
   digitalWrite(A_Dir, HIGH);
   digitalWrite(B_Dir, LOW);
   delay(5);
@@ -279,7 +281,31 @@ void drivetonet(){
   analogWrite(A_PWM, 0);
   analogWrite(B_PWM, 0);
   delay(500);
+  //Scora
   setServoPosition(120);
+  //Kör fram till mitten igen
+  int x = 0;
+  long dist;
+  unsigned long startTime = millis();
+  while(x < 3){
+    x = 0;
+    for(int i = 0; i < 3; i++) {
+        dist = ping(trigPin_FrontUpper, echoPin_FrontUpper);
+        if (dist < 100) {
+          x++;
+        }
+      }
+      if  (startTime - millis() > 20000) {
+          break;
+      }
+    digitalWrite(A_Dir, LOW);
+    digitalWrite(B_Dir, LOW);
+    analogWrite(A_PWM, 255); //Ändrad
+    analogWrite(B_PWM, 200 );
+  }
+  analogWrite(A_PWM, 0);
+  analogWrite(B_PWM, 0);
+  delay(500);
 }
 
 
