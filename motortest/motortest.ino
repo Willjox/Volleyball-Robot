@@ -16,17 +16,16 @@ int pos, pos2;
 #define led1 53
 #define led2 23
 
-#define trigPin_BackUp 26
-#define echoPin_backUp 27
+#define trigPin_BackUpper 26
+#define echoPin_BackUpper 27
 
-#define trigPin_BackLow 44
-#define echoPin_backLow 45
+#define trigPin_BackLower 44
+#define echoPin_BackLower 45
 
 //Pins for dReader
-#define trigPin_upper  43
-#define echoPin_upper 41
-
-const int lower_dreader = 39;
+#define trigPin_FrontUpper  43
+#define echoPin_FrontUpper 41
+#define trigEcho_LowerFront  39;
 
 long duration, upperCm, lowerCm, cm;
 
@@ -46,8 +45,8 @@ void setup() {
   pinMode(B_Break, OUTPUT);
 
   // DISTANCE READER PINS
-  pinMode(trigPin_upper, OUTPUT);
-  pinMode(echoPin_upper, INPUT);
+  pinMode(trigPin_FrontUpper, OUTPUT);
+  pinMode(echoPin_FrontUpper, INPUT);
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
 
@@ -84,29 +83,31 @@ void enterArena() {
   while(startTime - millis() < 5000) {
     analogWrite(A_PWM, 255);
     analogWrite(B_PWM, 200 );
-  }
-
-
-}
-
-void ballstate(){
-  digitalWrite(A_Dir, HIGH);
-  digitalWrite(B_Dir, LOW);
-  delay(5);
-  int x = 0;
-  while(x < 7){
-    x = 0;
-    analogWrite(A_PWM, 255);
-    analogWrite(B_PWM, 255 );
-    delay(50);
-    analogWrite(A_PWM, 0);
-    analogWrite(B_PWM, 0);
-    delay(1000);
-    for(int i = 0; i < 10; i++) {
-      x = x + findBall();
     }
   }
-  digitalWrite(led2, LOW);
+
+void setServoPosition() {
+}
+
+int findDiff(int upperTrig, int upperEcho, int lowerTrig int lowerEcho, int minimumDiff) {
+  upperCm = ping(upperTrig, upperEcho); //Measure upper distance
+  if (upperCm > 200) { //High values becomes wacky
+      upperCm = 200;
+    }
+
+  lowerCm = ping(lowerTrig, upperTrig); //Measure lower
+  Serial.print(upperCm);
+  Serial.print(" ");
+  Serial.println(lowerCm);
+  delay(10);
+
+  if(lowerCm < (upperCm - minimumDiff)){ //Decide if diff is large enough
+    digitalWrite(led1, HIGH); //led On to indicate a to large diff
+    return 1;
+  } else{
+    digitalWrite(led1, LOW);
+    return 0;
+  }
 }
 
 long ping(int trigPin , int echoPin) {
@@ -132,25 +133,25 @@ long ping(int trigPin , int echoPin) {
   return(cm);
 }
 
-int findBall(){
-  upperCm = ping(trigPin_upper, echoPin_upper);
-  if (upperCm > 200) {
-    upperCm = 200;
-  }
-  lowerCm = ping(lower_dreader, lower_dreader);
-  Serial.print(upperCm);
-  Serial.print(" ");
-  Serial.println(lowerCm);
-  delay(10);
 
-  if(lowerCm < (upperCm - 4)){
-    digitalWrite(led1, HIGH);
-    return 1;
-
-  } else{
-    digitalWrite(led1, LOW);
-    return 0;
+void ballstate(){
+  digitalWrite(A_Dir, HIGH);
+  digitalWrite(B_Dir, LOW);
+  delay(5);
+  int x = 0;
+  while(x < 7){
+    x = 0;
+    analogWrite(A_PWM, 255);
+    analogWrite(B_PWM, 255 );
+    delay(50);
+    analogWrite(A_PWM, 0);
+    analogWrite(B_PWM, 0);
+    delay(1000);
+    for(int i = 0; i < 10; i++) {
+      x = x + findDiff(trigPin_FrontUpper, echoPin_FrontUpper, trigEcho_LowerFront, 4);
+    }
   }
+  digitalWrite(led2, LOW);
 }
 
 void drivetoball(){
@@ -168,7 +169,7 @@ void drivetoball(){
   while(x < 3){
     x = 0;
     for(int i = 0; i < 3; i++) {
-        dist = ping(trigPin_upper, echoPin_upper);
+        dist = ping(trigPin_FrontUpper, echoPin_FrontUpper);
         if (dist < 30) {
           x++;
         }
@@ -197,7 +198,7 @@ void backup(){
   while(x < 3){
     x = 0;
     for(int i = 0; i < 10; i++) {
-        dist = ping(trigPin_upper, echoPin_upper);
+        dist = ping(trigPin_FrontUpper, echoPin_FrontUpper);
         if (dist > 80 ) {
           x++;
         }
@@ -217,33 +218,17 @@ void backup(){
   }
 }
 
-
-
-int findNet() {
-  upperCm = ping(trigPin_BackUp, echoPin_backUp);
-  if (upperCm > 250) {
-    upperCm = 250;
-  }
-  lowerCm = ping(trigPin_BackLow, echoPin_backLow);
-  Serial.print(upperCm);
-  Serial.print(" ");
-  Serial.println(lowerCm);
-  delay(10);
-
-  if(lowerCm < (upperCm - 10)){
-    digitalWrite(led1, HIGH);
-    return 1;
-
-  } else{
-    digitalWrite(led1, LOW);
-    return 0;
-  }
-}
-
 void netState() {
+  #define trigPin_BackUpper 26
+  #define echoPin_BackUpper 27
+
+  #define trigPin_BackLower 44
+  #define echoPin_backLow 45
+  // ställ in moterorerna så att roboten snurrar
   digitalWrite(A_Dir, HIGH);
   digitalWrite(B_Dir, LOW);
   delay(5);
+  // leta efter skillnader i bakre sensorerna
   int x = 0;
   while(x < 7){
     x = 0;
@@ -254,7 +239,7 @@ void netState() {
     analogWrite(B_PWM, 0);
     delay(1000);
     for(int i = 0; i < 10; i++) {
-      x = x + findNet();
+      x = x + findDiff(trigPin_BackUpper, echoPin_BackUpper, trigPin_BackLower, echoPin_BackLow, 10);
     }
   }
   digitalWrite(led2, LOW);
@@ -267,7 +252,7 @@ void drivetonet(){
   while(x < 3){
     x = 0;
     for(int i = 0; i < 3; i++) {
-        dist = ping(trigPin_BackLow, echoPin_backLow);
+        dist = ping(trigPin_BackLower, echoPin_backLow);
         if (dist < 30) {
           x++;
         }
