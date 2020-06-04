@@ -16,16 +16,16 @@ int pos, pos2;
 #define led1 53
 #define led2 23
 
-#define trigPin_BackUpper 50
-#define echoPin_BackUpper 51
+#define trigPin_BackUpper 26
+#define echoPin_BackUpper 27
 
 #define trigPin_BackLower 44
 #define echoPin_BackLower 45
 
 //Pins for dReader
-#define trigPin_FrontUpper  43
-#define echoPin_FrontUpper 41
-#define trigEcho_LowerFront  39
+#define trigPin_FrontUpper  50
+#define echoPin_FrontUpper 51
+#define trigEcho_LowerFront  30
 
 long duration, upperCm, lowerCm, cm;
 
@@ -47,6 +47,14 @@ void setup() {
   // DISTANCE READER PINS
   pinMode(trigPin_FrontUpper, OUTPUT);
   pinMode(echoPin_FrontUpper, INPUT);
+
+  pinMode(trigPin_BackUpper, OUTPUT);
+  pinMode(echoPin_BackUpper, INPUT);
+
+  pinMode(trigPin_BackLower, OUTPUT);
+  pinMode(echoPin_BackLower, INPUT);
+
+
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
 
@@ -60,11 +68,11 @@ void setup() {
 void loop() {
   //enterArena();
   ballstate();
-  drivetoball();
-  pickupball();
-  backup();
-  netState();  //Använd kompass?
-  drivetonet();
+  //drivetoball();
+  //pickupball();
+  //backup();
+  //netState();  //Använd kompass?
+  //drivetonet();
   //score();    //Använd servo
 }
 
@@ -118,7 +126,7 @@ int findDiff(int upperTrig, int upperEcho, int lowerTrig, int lowerEcho, int min
 }
 
 long ping(int trigPin , int echoPin) {
-  if (trigPin == 39){
+  if (trigPin == trigEcho_LowerFront){
     pinMode(trigPin, OUTPUT);
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
@@ -142,7 +150,7 @@ long ping(int trigPin , int echoPin) {
 
 
 void ballstate(){
-  setServoPosition(90);
+  //setServoPosition(90);
   digitalWrite(A_Dir, HIGH);
   digitalWrite(B_Dir, LOW);
   delay(5);
@@ -215,7 +223,7 @@ void backup(){
     digitalWrite(B_Dir, HIGH);
     analogWrite(A_PWM, 255);
     analogWrite(B_PWM, 180);
-    if (startTime - millis() > 20000) {
+    if (millis() - startTime > 20000) {
       break;
     }
   }
@@ -260,7 +268,7 @@ void drivetonet(){
           x++;
         }
       }
-      if  (startTime - millis() > 20000) {
+      if  (millis() - startTime > 20000) {
           break;
       }
     digitalWrite(A_Dir, HIGH);
