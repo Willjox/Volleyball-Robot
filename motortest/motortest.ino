@@ -16,8 +16,8 @@ int pos, pos2;
 #define led1 53
 #define led2 23
 
-#define trigPin_BackUpper 26
-#define echoPin_BackUpper 27
+#define trigPin_BackUpper 50
+#define echoPin_BackUpper 51
 
 #define trigPin_BackLower 44
 #define echoPin_BackLower 45
@@ -25,7 +25,7 @@ int pos, pos2;
 //Pins for dReader
 #define trigPin_FrontUpper  43
 #define echoPin_FrontUpper 41
-#define trigEcho_LowerFront  39;
+#define trigEcho_LowerFront  39
 
 long duration, upperCm, lowerCm, cm;
 
@@ -33,8 +33,8 @@ void setup() {
   Serial.begin(9600);
 
   // SERVO
-  myservo1.attach(27);
-  myservo2.attach(37);
+  myservo1.attach(34);
+  myservo2.attach(36);
 
  // MOTOR PINS
   pinMode(A_Dir, OUTPUT);
@@ -53,24 +53,16 @@ void setup() {
   digitalWrite(A_Break, LOW);
   digitalWrite(B_Break, LOW);
   pos2 = 0;
-  pos = 90;
-
-  for (pos; pos >= 0; pos -= 1) {// goes from 180 degrees to 0 degrees
-    myservo1.write(pos);        // tell servo to go to position in variable 'pos'
-    myservo2.write(pos2);
-    pos2 += 1;
-    delay(5);                       // waits 15ms for the servo to reach the position
-  }
-  delay(3000);
+  pos = 0;
 }
 
 
 void loop() {
   //enterArena();
-  //ballstate();
-  //drivetoball();
-  //pickupball();
-  //backup();
+  ballstate();
+  drivetoball();
+  pickupball();
+  backup();
   netState();  //Använd kompass?
   drivetonet();
   //score();    //Använd servo
@@ -80,31 +72,31 @@ void enterArena() {
   digitalWrite(A_Dir, LOW);
   digitalWrite(B_Dir, LOW);
   unsigned long startTime = millis();
-  while(startTime - millis() < 5000) {
+  while(startTime - millis() < 2000) {
     analogWrite(A_PWM, 255);
     analogWrite(B_PWM, 200 );
     }
   }
 
-void setServoPosition(int finalPos) {
-  if finalPos > pos {
-    for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 90 degrees// in steps of 1 degree
+void setServoPosition(int desiredPos) {
+  if (desiredPos > pos) {
+    for (pos; pos <= desiredPos; pos += 1) { // goes from 0 degrees to 90 degrees// in steps of 1 degree
       myservo1.write(pos);
       myservo2.write(pos2);
       pos2 -= 1;
       delay(5);
     }
-  } else if (finalPos < pos) {
-    for (pos; pos >= 0; pos -= 1) {
+  } else if (desiredPos < pos) {
+    for (pos; pos >= desiredPos; pos -= 1) {
       myservo1.write(pos);
       myservo2.write(pos2);
       pos2 += 1;
-      delay(5);                       
+      delay(5);
     }
   }
 }
 
-int findDiff(int upperTrig, int upperEcho, int lowerTrig int lowerEcho, int minimumDiff) {
+int findDiff(int upperTrig, int upperEcho, int lowerTrig, int lowerEcho, int minimumDiff) {
   upperCm = ping(upperTrig, upperEcho); //Measure upper distance
   if (upperCm > 200) { //High values becomes wacky
       upperCm = 200;
@@ -150,6 +142,7 @@ long ping(int trigPin , int echoPin) {
 
 
 void ballstate(){
+  setServoPosition(90);
   digitalWrite(A_Dir, HIGH);
   digitalWrite(B_Dir, LOW);
   delay(5);
@@ -163,7 +156,7 @@ void ballstate(){
     analogWrite(B_PWM, 0);
     delay(1000);
     for(int i = 0; i < 10; i++) {
-      x = x + findDiff(trigPin_FrontUpper, echoPin_FrontUpper, trigEcho_LowerFront, 4);
+      x = x + findDiff(trigPin_FrontUpper, echoPin_FrontUpper, trigEcho_LowerFront, trigEcho_LowerFront, 4);
     }
   }
   digitalWrite(led2, LOW);
@@ -171,13 +164,13 @@ void ballstate(){
 
 void drivetoball(){
 
-  for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 90 degrees// in steps of 1 degree
-    myservo1.write(pos);
-    myservo2.write(pos2);
-    pos2 -= 1;
-    delay(5);
-  }
-
+  //for (pos; pos <= 90; pos += 1) { // goes from 0 degrees to 90 degrees// in steps of 1 degree
+    //myservo1.write(pos);
+    //myservo2.write(pos2);
+    //pos2 -= 1;
+    //delay(5);
+  //}
+  setServoPosition(0);
   int x = 0;
   long dist;
   unsigned long startTime = millis();
@@ -203,7 +196,7 @@ void drivetoball(){
 }
 
 void pickupball(){
-
+  setServoPosition(90);
 }
 
 void backup(){
@@ -234,11 +227,6 @@ void backup(){
 }
 
 void netState() {
-  #define trigPin_BackUpper 26
-  #define echoPin_BackUpper 27
-
-  #define trigPin_BackLower 44
-  #define echoPin_backLow 45
   // ställ in moterorerna så att roboten snurrar
   digitalWrite(A_Dir, HIGH);
   digitalWrite(B_Dir, LOW);
@@ -254,7 +242,7 @@ void netState() {
     analogWrite(B_PWM, 0);
     delay(1000);
     for(int i = 0; i < 10; i++) {
-      x = x + findDiff(trigPin_BackUpper, echoPin_BackUpper, trigPin_BackLower, echoPin_BackLow, 10);
+      x = x + findDiff(trigPin_BackUpper, echoPin_BackUpper, trigPin_BackLower, echoPin_BackLower, 10);
     }
   }
   digitalWrite(led2, LOW);
@@ -267,7 +255,7 @@ void drivetonet(){
   while(x < 3){
     x = 0;
     for(int i = 0; i < 3; i++) {
-        dist = ping(trigPin_BackLower, echoPin_backLow);
+        dist = ping(trigPin_BackLower, echoPin_BackLower);
         if (dist < 30) {
           x++;
         }
@@ -283,6 +271,7 @@ void drivetonet(){
   analogWrite(A_PWM, 0);
   analogWrite(B_PWM, 0);
   delay(500);
+  setServoPosition(120);
 }
 
 
