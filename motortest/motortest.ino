@@ -303,9 +303,10 @@ void drivetonet(){
     analogWrite(A_PWM, 255); //Ändrad
     analogWrite(B_PWM, 200 );
   }
+  //Stanna
   analogWrite(A_PWM, 0);
   analogWrite(B_PWM, 0);
-  delay(500);
+  delay(100);
 }
 
 
