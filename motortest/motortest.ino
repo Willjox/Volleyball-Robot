@@ -112,7 +112,7 @@ int findDiff(int upperTrig, int upperEcho, int lowerTrig, int lowerEcho, int min
       upperCm = 200;
     }
 
-  lowerCm = ping(lowerTrig, upperTrig); //Measure lower
+  lowerCm = ping(lowerTrig, lowerEcho); //Measure lower
   Serial.print(upperCm);
   Serial.print(" ");
   Serial.println(lowerCm);
